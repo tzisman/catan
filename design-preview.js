@@ -1,0 +1,905 @@
+/** Shared theme configs + mock board renderer for design previews */
+
+const RESOURCE_COLORS = {
+  brick: "#c45c3e",
+  wood: "#2d6a4f",
+  sheep: "#95d5b2",
+  wheat: "#e9c46a",
+  ore: "#6c757d",
+  desert: "#d4a574",
+};
+
+const HEX_ROWS = [3, 4, 5, 4, 3];
+const HEX_RESOURCES = [
+  "ore", "sheep", "wood",
+  "wheat", "brick", "sheep", "brick",
+  "wheat", "wood", "desert", "wood", "ore",
+  "wood", "ore", "wheat", "sheep",
+  "brick", "wheat", "sheep",
+];
+const HEX_NUMBERS = [
+  10, 2, 9, 12, 6, 4, 10, 9, 11, null, 3, 8, 8, 3, 4, 5, 5, 6, 11,
+];
+
+const concepts = [
+  {
+    title: "קלאסי מודרני",
+    style: "Board Game Premium",
+    desc: "לוח משושים עם טקסטורות עץ ודשא עדינות, צללים רכים ו-3D קל. פאנל צד מינימלי בלבן-קרם, כפתורים מעוגלים ואייקונים line-art.",
+    tags: ["עץ", "3D עדין", "קרם", "מוכר"],
+    theme: {
+      bg: "#e8dcc8",
+      bg2: "#f5f0e6",
+      surface: "#fffdf8",
+      text: "#3d2c1e",
+      muted: "#8b7355",
+      accent: "#2d5016",
+      boardBg: "#c4a574",
+      font: "'Georgia', serif",
+      radius: "12px",
+      hexStroke: "#5c4033",
+      hexShadow: "0 4px 12px rgba(60,40,20,0.25)",
+      headerStyle: "classic",
+    },
+  },
+  {
+    title: "Brutalist Digital",
+    style: "Neo-Brutalism",
+    desc: "גבולות שחורים עבים, צללים offset קשיחים, פונט גיאומטרי bold.",
+    tags: ["flat", "bold", "offset shadow"],
+    theme: {
+      bg: "#fff",
+      bg2: "#f0f0f0",
+      surface: "#ffeb3b",
+      text: "#000",
+      muted: "#333",
+      accent: "#ff5722",
+      boardBg: "#e0e0e0",
+      font: "'Arial Black', sans-serif",
+      radius: "0",
+      hexStroke: "#000",
+      hexStrokeWidth: 3,
+      brutal: true,
+      headerStyle: "brutal",
+    },
+  },
+  {
+    title: "Glassmorphism Island",
+    style: "Glass UI",
+    desc: "רקע gradient של שמיים וים, הלוח על זכוכית frosted עם blur.",
+    tags: ["blur", "שקיפות", "gradient"],
+    theme: {
+      bg: "linear-gradient(160deg, #87CEEB 0%, #2ec4b6 50%, #011627 100%)",
+      bg2: "rgba(255,255,255,0.15)",
+      surface: "rgba(255,255,255,0.2)",
+      text: "#fff",
+      muted: "rgba(255,255,255,0.75)",
+      accent: "#ff6b35",
+      boardBg: "rgba(255,255,255,0.12)",
+      font: "'Assistant', sans-serif",
+      radius: "20px",
+      glass: true,
+      hexStroke: "rgba(255,255,255,0.5)",
+      headerStyle: "glass",
+    },
+  },
+  {
+    title: "Dark Strategy",
+    style: "Dark Mode Pro",
+    desc: "רקע כהה, משושים עם saturation נמוך ו-accent על אלמנטים פעילים.",
+    tags: ["dark", "minimal", "accent colors"],
+    theme: {
+      bg: "#0f1117",
+      bg2: "#1a1d27",
+      surface: "#222633",
+      text: "#e8eaef",
+      muted: "#8b92a8",
+      accent: "#6c9eff",
+      boardBg: "#161922",
+      font: "'Assistant', sans-serif",
+      radius: "10px",
+      hexStroke: "#3a3f52",
+      desaturate: 0.65,
+      headerStyle: "dark",
+    },
+  },
+  {
+    title: "Solarized Board",
+    style: "Solarized Palette",
+    desc: "פלטת Solarized — ירוק דשא, כחול ים, צהוב חול, כתום lava.",
+    tags: ["solarized", "מדעי", "ניגודיות"],
+    theme: {
+      bg: "#fdf6e3",
+      bg2: "#eee8d5",
+      surface: "#fdf6e3",
+      text: "#073642",
+      muted: "#93a1a1",
+      accent: "#268bd2",
+      boardBg: "#eee8d5",
+      font: "'Rubik', sans-serif",
+      radius: "6px",
+      solarized: true,
+      hexStroke: "#586e75",
+      headerStyle: "solarized",
+    },
+  },
+  {
+    title: "Medieval Manuscript",
+    style: "Illuminated Parchment",
+    desc: "רקע קלף מעור, משושים כמו אריחים מצוירים בדיו.",
+    tags: ["pergament", "serif", "line-art"],
+    theme: {
+      bg: "#f5e6d3",
+      bg2: "#ede0c8",
+      surface: "#faf3e8",
+      text: "#2c1810",
+      muted: "#6b5344",
+      accent: "#8b4513",
+      boardBg: "#e8d5b7",
+      font: "'Georgia', 'Times New Roman', serif",
+      radius: "4px",
+      parchment: true,
+      hexStroke: "#4a3728",
+      headerStyle: "medieval",
+    },
+  },
+  {
+    title: "GitHub Developer",
+    style: "Dev Tool Aesthetic",
+    desc: "ממשק דמוי IDE — monospace ללוג, syntax highlighting.",
+    tags: ["monospace", "IDE", "SVG"],
+    theme: {
+      bg: "#0d1117",
+      bg2: "#161b22",
+      surface: "#21262d",
+      text: "#c9d1d9",
+      muted: "#8b949e",
+      accent: "#58a6ff",
+      boardBg: "#161b22",
+      font: "'Consolas', 'Courier New', monospace",
+      radius: "6px",
+      hexStroke: "#30363d",
+      ide: true,
+      headerStyle: "ide",
+    },
+  },
+  {
+    title: "Luxury Gold Edition",
+    style: "Premium Collector",
+    desc: "רקע שחור-עמוק, מסגרות זהב, משושים metallic.",
+    tags: ["זהב", "premium", "metallic"],
+    theme: {
+      bg: "#0a0a0a",
+      bg2: "#141414",
+      surface: "#1a1a1a",
+      text: "#f5e6c8",
+      muted: "#c9a96e",
+      accent: "#d4af37",
+      boardBg: "#111",
+      font: "'Georgia', serif",
+      radius: "8px",
+      gold: true,
+      hexStroke: "#d4af37",
+      headerStyle: "luxury",
+    },
+  },
+  {
+    title: "Eco Minimal",
+    style: "Scandinavian Nature",
+    desc: "צבעי טבע muted — sage, sand, clay. whitespace ו-outline דק.",
+    tags: ["nordic", "muted", "whitespace"],
+    theme: {
+      bg: "#f7f5f2",
+      bg2: "#eeeae4",
+      surface: "#fff",
+      text: "#3d4f42",
+      muted: "#8a9a8e",
+      accent: "#5a7d6a",
+      boardBg: "#e8e4dc",
+      font: "'Assistant', sans-serif",
+      radius: "16px",
+      hexStroke: "#c5cbb8",
+      eco: true,
+      headerStyle: "eco",
+    },
+  },
+  {
+    title: "Neon Arcade",
+    style: "Synthwave / Cyber",
+    desc: "רקע סגול-כחול, grid perspective, neon glow.",
+    tags: ["neon", "synthwave", "glow"],
+    theme: {
+      bg: "linear-gradient(180deg, #1a0533 0%, #0f0f23 60%, #ff006e 100%)",
+      bg2: "#1a0533",
+      surface: "rgba(20,10,40,0.8)",
+      text: "#fff",
+      muted: "#b388ff",
+      accent: "#00ffff",
+      boardBg: "rgba(0,0,0,0.4)",
+      font: "'Rubik', sans-serif",
+      radius: "4px",
+      neon: true,
+      hexStroke: "#ff00ff",
+      headerStyle: "neon",
+    },
+  },
+  {
+    title: "Flat Illustration",
+    style: "Modern Illustration",
+    desc: "משושים כמו איורים vector — צבעים flat ו-playful.",
+    tags: ["vector", "illustration", "playful"],
+    theme: {
+      bg: "#fef9ef",
+      bg2: "#fff5e6",
+      surface: "#fff",
+      text: "#264653",
+      muted: "#2a9d8f",
+      accent: "#e76f51",
+      boardBg: "#e9c46a",
+      font: "'Rubik', sans-serif",
+      radius: "24px",
+      flat: true,
+      hexStroke: "#264653",
+      headerStyle: "flat",
+    },
+  },
+  {
+    title: "Swiss Grid",
+    style: "International Typographic",
+    desc: "grid 8px, Helvetica, שחור-לבן עם accent אדום.",
+    tags: ["grid", "typography", "swiss"],
+    theme: {
+      bg: "#fff",
+      bg2: "#f5f5f5",
+      surface: "#fff",
+      text: "#000",
+      muted: "#666",
+      accent: "#e00",
+      boardBg: "#fafafa",
+      font: "Helvetica, Arial, sans-serif",
+      radius: "0",
+      hexStroke: "#000",
+      swiss: true,
+      headerStyle: "swiss",
+    },
+  },
+  {
+    title: "Cosmic Catan",
+    style: "Space Exploration",
+    desc: "האי צף בחלל — כוכבים, nebula, sci-fi נקי.",
+    tags: ["space", "sci-fi", "nebula"],
+    theme: {
+      bg: "radial-gradient(ellipse at 30% 20%, #302b63, #0f0f23 70%)",
+      bg2: "#1a0533",
+      surface: "rgba(30,20,60,0.85)",
+      text: "#e0e7ff",
+      muted: "#a5b4fc",
+      accent: "#818cf8",
+      boardBg: "rgba(15,10,35,0.6)",
+      font: "'Assistant', sans-serif",
+      radius: "12px",
+      cosmic: true,
+      hexStroke: "#6366f1",
+      headerStyle: "cosmic",
+    },
+  },
+  {
+    title: "Naval Empire",
+    style: "Maritime Classic",
+    desc: "מפת ימאים — כחול-זהב, grid lines של מפה ישנה.",
+    tags: ["ימי", "מפה", "זהב-כחול"],
+    theme: {
+      bg: "#0a1628",
+      bg2: "#0f2847",
+      surface: "#1e3a5f",
+      text: "#f0e6c8",
+      muted: "#c9a227",
+      accent: "#c9a227",
+      boardBg: "#1a3050",
+      font: "'Georgia', serif",
+      radius: "6px",
+      naval: true,
+      hexStroke: "#c9a227",
+      headerStyle: "naval",
+    },
+  },
+  {
+    title: "Warm Sunset",
+    style: "Golden Hour",
+    desc: "gradient שקיעה — כתום, ורוד, סגול. warm white.",
+    tags: ["warm", "gradient", "שקיעה"],
+    theme: {
+      bg: "linear-gradient(135deg, #fff5e6, #ffcba4, #ff8c42, #d62828)",
+      bg2: "#fff0e0",
+      surface: "rgba(255,255,255,0.85)",
+      text: "#5c3317",
+      muted: "#8b6914",
+      accent: "#d62828",
+      boardBg: "rgba(255,200,150,0.4)",
+      font: "'Assistant', sans-serif",
+      radius: "14px",
+      sunset: true,
+      hexStroke: "#8b4513",
+      headerStyle: "sunset",
+    },
+  },
+  {
+    title: "Ice & Frost",
+    style: "Arctic Minimal",
+    desc: "פלטה קרירה — ice blue, white, silver, frost texture.",
+    tags: ["קר", "קריסטל", "כחול"],
+    theme: {
+      bg: "#e8f4f8",
+      bg2: "#d6eef5",
+      surface: "rgba(255,255,255,0.9)",
+      text: "#1e3a5f",
+      muted: "#5a9ab8",
+      accent: "#0284c7",
+      boardBg: "#b8d4e3",
+      font: "'Assistant', sans-serif",
+      radius: "12px",
+      frost: true,
+      hexStroke: "#7dd3fc",
+      headerStyle: "frost",
+    },
+  },
+  {
+    title: "Monochrome Elegance",
+    style: "Single-Color System",
+    desc: "גווני אפור + accent lime. hierarchy ב-pattern.",
+    tags: ["monochrome", "accessible", "pattern"],
+    theme: {
+      bg: "#f5f5f5",
+      bg2: "#ebebeb",
+      surface: "#fff",
+      text: "#1c1c1c",
+      muted: "#666",
+      accent: "#84cc16",
+      boardBg: "#e0e0e0",
+      font: "'Assistant', sans-serif",
+      radius: "8px",
+      mono: true,
+      hexStroke: "#999",
+      headerStyle: "mono",
+    },
+  },
+  {
+    title: "Woodcraft Workshop",
+    style: "Artisan Craft",
+    desc: "כל אלמנט כמו עץ מגולף — grain texture, corners ידניים.",
+    tags: ["עץ", "craft", "texture"],
+    theme: {
+      bg: "#d4a574",
+      bg2: "#c4956a",
+      surface: "#f5deb3",
+      text: "#3e2723",
+      muted: "#5c3d1e",
+      accent: "#8b4513",
+      boardBg: "#a67c52",
+      font: "'Georgia', serif",
+      radius: "10px",
+      wood: true,
+      hexStroke: "#5c3d1e",
+      headerStyle: "wood",
+    },
+  },
+  {
+    title: "Holographic UI",
+    style: "Futuristic HUD",
+    desc: "HUD שקוף עם קווי מדידה, wireframe + fill gradient.",
+    tags: ["HUD", "wireframe", "futuristic"],
+    theme: {
+      bg: "#0f0f23",
+      bg2: "#12122a",
+      surface: "rgba(0,210,255,0.08)",
+      text: "#00d2ff",
+      muted: "#67e8f9",
+      accent: "#00d2ff",
+      boardBg: "rgba(0,50,80,0.3)",
+      font: "'Consolas', monospace",
+      radius: "2px",
+      hud: true,
+      hexStroke: "#00d2ff",
+      headerStyle: "hud",
+    },
+  },
+  {
+    title: "Paper Cutout",
+    style: "Layered Paper Craft",
+    desc: "שכבות נייר — drop shadow, index cards, pastel.",
+    tags: ["paper", "layers", "pastel"],
+    theme: {
+      bg: "#f8f4e9",
+      bg2: "#ede8dc",
+      surface: "#fff",
+      text: "#4a3728",
+      muted: "#8b7355",
+      accent: "#e07a5f",
+      boardBg: "#d4c5a9",
+      font: "'Rubik', sans-serif",
+      radius: "4px",
+      paper: true,
+      hexStroke: "#8b7355",
+      headerStyle: "paper",
+    },
+  },
+  {
+    title: "Soft Pastel Play",
+    style: "Friendly Casual",
+    desc: "pastels רכים — mint, peach, lavender. rounded everything.",
+    tags: ["pastel", "friendly", "rounded"],
+    theme: {
+      bg: "#ffecd2",
+      bg2: "#fcb69f",
+      surface: "#fff",
+      text: "#5c4d7d",
+      muted: "#9b8ec4",
+      accent: "#ff9a9e",
+      boardBg: "#fecfef",
+      font: "'Rubik', sans-serif",
+      radius: "20px",
+      pastel: true,
+      hexStroke: "#c4b5fd",
+      headerStyle: "pastel",
+    },
+  },
+  {
+    title: "Deep Forest",
+    style: "Moss & Shadow",
+    desc: "ירוקים עמוקים, חום קליפה, ערפל עדין.",
+    tags: ["יער", "immersive", "atmospheric"],
+    theme: {
+      bg: "linear-gradient(180deg, #1b4332 0%, #081c15 100%)",
+      bg2: "#1b4332",
+      surface: "rgba(27,67,50,0.9)",
+      text: "#d8f3dc",
+      muted: "#95d5b2",
+      accent: "#40916c",
+      boardBg: "rgba(8,28,21,0.7)",
+      font: "'Assistant', sans-serif",
+      radius: "10px",
+      forest: true,
+      hexStroke: "#2d6a4f",
+      headerStyle: "forest",
+    },
+  },
+  {
+    title: "Ultra Minimal Zen",
+    style: "Japanese Ma (間)",
+    desc: "כמעט ריק — לוח + מספרים. less is more.",
+    tags: ["zen", "minimal", "ma"],
+    theme: {
+      bg: "#fafafa",
+      bg2: "#f0f0f0",
+      surface: "#fff",
+      text: "#18181b",
+      muted: "#a1a1aa",
+      accent: "#18181b",
+      boardBg: "#f4f4f5",
+      font: "'Assistant', sans-serif",
+      radius: "2px",
+      zen: true,
+      hexStroke: "#d4d4d8",
+      headerStyle: "zen",
+    },
+  },
+  {
+    title: "Volcanic Forge",
+    style: "Dramatic Dark Warm",
+    desc: "רקע lava, glow כתום-אדום, intense dramatic.",
+    tags: ["lava", "dramatic", "intense"],
+    theme: {
+      bg: "linear-gradient(180deg, #450a0a 0%, #1a0505 50%, #991b1b 100%)",
+      bg2: "#450a0a",
+      surface: "rgba(60,10,10,0.9)",
+      text: "#fca5a5",
+      muted: "#f87171",
+      accent: "#dc2626",
+      boardBg: "rgba(30,5,5,0.8)",
+      font: "'Rubik', sans-serif",
+      radius: "6px",
+      volcanic: true,
+      hexStroke: "#ef4444",
+      headerStyle: "volcanic",
+    },
+  },
+  {
+    title: "Mint Fresh",
+    style: "Clean Startup",
+    desc: "לבן, mint green accent, SaaS dashboard מודרני.",
+    tags: ["startup", "mint", "clean"],
+    theme: {
+      bg: "#ecfdf5",
+      bg2: "#d1fae5",
+      surface: "#fff",
+      text: "#064e3b",
+      muted: "#059669",
+      accent: "#10b981",
+      boardBg: "#a7f3d0",
+      font: "'Assistant', sans-serif",
+      radius: "12px",
+      mint: true,
+      hexStroke: "#6ee7b7",
+      headerStyle: "mint",
+    },
+  },
+  {
+    title: "Desert Nomad",
+    style: "Sahara Warmth",
+    desc: "חול, terracotta, turquoise. theme מדברי.",
+    tags: ["מדבר", "terracotta", "pattern"],
+    theme: {
+      bg: "#fef3c7",
+      bg2: "#fde68a",
+      surface: "#fffbeb",
+      text: "#78350f",
+      muted: "#b45309",
+      accent: "#0d9488",
+      boardBg: "#fcd34d",
+      font: "'Georgia', serif",
+      radius: "8px",
+      desert: true,
+      hexStroke: "#d97706",
+      headerStyle: "desert",
+    },
+  },
+  {
+    title: "Ocean Depths",
+    style: "Underwater Serene",
+    desc: "gradient כחול-teal, bubbles, caustics light.",
+    tags: ["ocean", "underwater", "serene"],
+    theme: {
+      bg: "linear-gradient(180deg, #0c4a6e 0%, #164e63 40%, #134e4a 100%)",
+      bg2: "#0e7490",
+      surface: "rgba(6,78,99,0.7)",
+      text: "#cffafe",
+      muted: "#67e8f9",
+      accent: "#22d3ee",
+      boardBg: "rgba(8,51,68,0.5)",
+      font: "'Assistant', sans-serif",
+      radius: "16px",
+      ocean: true,
+      hexStroke: "#0891b2",
+      headerStyle: "ocean",
+    },
+  },
+  {
+    title: "Bauhaus Blocks",
+    style: "Primary Colors Modernism",
+    desc: "אדום, צהוב, כחול primary — geometric pure.",
+    tags: ["bauhaus", "primary", "geometric"],
+    theme: {
+      bg: "#fff",
+      bg2: "#f0f0f0",
+      surface: "#ff0",
+      text: "#000",
+      muted: "#333",
+      accent: "#00f",
+      boardBg: "#eee",
+      font: "Arial, sans-serif",
+      radius: "0",
+      bauhaus: true,
+      hexStroke: "#000",
+      headerStyle: "bauhaus",
+    },
+  },
+  {
+    title: "Art Deco Empire",
+    style: "1920s Glamour",
+    desc: "זהב-שחור-emerald, patterns chevron, typography Art Deco.",
+    tags: ["art deco", "1920s", "glamour"],
+    theme: {
+      bg: "#111",
+      bg2: "#1a1a1a",
+      surface: "#1c2a1c",
+      text: "#ffd700",
+      muted: "#c9a227",
+      accent: "#50c878",
+      boardBg: "#0d0d0d",
+      font: "'Georgia', serif",
+      radius: "0",
+      artdeco: true,
+      hexStroke: "#ffd700",
+      headerStyle: "artdeco",
+    },
+  },
+  {
+    title: "Stone & Slate",
+    style: "Monument Minimal",
+    desc: "אפור-אבן, texture slate, timeless stable.",
+    tags: ["stone", "timeless", "slate"],
+    theme: {
+      bg: "#e7e5e4",
+      bg2: "#d6d3d1",
+      surface: "#fafaf9",
+      text: "#44403c",
+      muted: "#78716c",
+      accent: "#57534e",
+      boardBg: "#d6d3d1",
+      font: "'Assistant', sans-serif",
+      radius: "6px",
+      stone: true,
+      hexStroke: "#a8a29e",
+      headerStyle: "stone",
+    },
+  },
+];
+
+function hexPoints(cx, cy, r) {
+  const pts = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 180) * (60 * i - 30);
+    pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+  }
+  return pts.join(" ");
+}
+
+function buildBoardSvg(theme) {
+  const r = 28;
+  const w = 72;
+  const h = 62;
+  let idx = 0;
+  let svg = "";
+  const startY = 55;
+  const startX = 200;
+
+  HEX_ROWS.forEach((count, row) => {
+    const offsetX = startX + ((5 - count) * w) / 2;
+    for (let col = 0; col < count; col++) {
+      const cx = offsetX + col * w + (row % 2 === 0 ? 0 : w / 2);
+      const cy = startY + row * h;
+      const resource = HEX_RESOURCES[idx];
+      let fill = RESOURCE_COLORS[resource];
+      if (theme.desaturate) fill = fill;
+
+      const stroke = theme.hexStroke || "#333";
+      const sw = theme.hexStrokeWidth || 1.5;
+      const num = HEX_NUMBERS[idx];
+      const isDesert = resource === "desert";
+
+      let filter = "";
+      if (theme.neon) filter = ' filter="url(#neonGlow)"';
+      if (theme.gold) filter = ' filter="url(#goldGlow)"';
+
+      svg += `<polygon points="${hexPoints(cx, cy, r)}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"${filter}/>`;
+      if (num !== null) {
+        const fc = theme.text || "#111";
+        svg += `<circle cx="${cx}" cy="${cy}" r="14" fill="${theme.surface || "#fff"}" stroke="${stroke}" stroke-width="1"/>`;
+        svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="${fc}" font-family="${theme.font}">${num}</text>`;
+      } else if (isDesert) {
+        svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="14" fill="${theme.muted}">🏜</text>`;
+      }
+      idx++;
+    }
+  });
+
+  return svg;
+}
+
+function getPreviewStyles(theme) {
+  const t = theme;
+  let extra = "";
+
+  if (t.brutal) {
+    extra += `
+      .mock-header, .mock-sidebar, .mock-controls, .mock-hand { border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
+      .mock-btn { border: 3px solid #000; box-shadow: 3px 3px 0 #000; font-weight: 900; }
+    `;
+  }
+  if (t.glass) {
+    extra += `
+      .mock-header, .mock-sidebar, .mock-board-wrap, .mock-controls {
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,255,255,0.3);
+      }
+    `;
+  }
+  if (t.neon) {
+    extra += `
+      body::after { content:""; position:fixed; inset:0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px); pointer-events:none; }
+      .mock-board-wrap { box-shadow: 0 0 30px rgba(255,0,255,0.4); }
+    `;
+  }
+  if (t.parchment) {
+    extra += `body { background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); }`;
+  }
+  if (t.cosmic) {
+    extra += `body::before { content:""; position:fixed; inset:0; background: radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 60% 70%, #fff, transparent), radial-gradient(2px 2px at 80% 10%, #fff, transparent); background-size: 200px 200px; opacity:0.6; pointer-events:none; }`;
+  }
+  if (t.hud) {
+    extra += `.mock-header { border-bottom: 1px solid var(--accent); letter-spacing: 0.1em; text-transform: uppercase; font-size: 11px; }`;
+  }
+  if (t.artdeco) {
+    extra += `.mock-header, .mock-sidebar { border: 2px solid var(--accent); background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,215,0,0.03) 10px, rgba(255,215,0,0.03) 20px); }`;
+  }
+
+  return `
+    :root {
+      --bg: ${typeof t.bg === "string" && !t.bg.includes("gradient") && !t.bg.includes("radial") ? t.bg : "#111"};
+      --bg2: ${t.bg2};
+      --surface: ${t.surface};
+      --text: ${t.text};
+      --muted: ${t.muted};
+      --accent: ${t.accent};
+      --board-bg: ${t.boardBg};
+      --radius: ${t.radius};
+      --font: ${t.font};
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: ${t.bg};
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      pointer-events: none;
+    }
+    .preview-banner {
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      text-align: center;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      font-family: 'Assistant', sans-serif;
+      pointer-events: auto;
+    }
+    .preview-banner strong { color: #4ade80; }
+    .mock-app { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .mock-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid rgba(128,128,128,0.2);
+    }
+    .mock-logo { font-weight: 700; font-size: 1.1rem; }
+    .mock-turn { color: var(--muted); font-size: 0.85rem; margin-inline-start: 1rem; }
+    .mock-dice { display: inline-flex; gap: 4px; margin-inline-start: 0.75rem; }
+    .mock-dice span {
+      width: 28px; height: 28px; background: var(--bg2); border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;
+      border: 1px solid rgba(128,128,128,0.25);
+    }
+    .mock-header-right { display: flex; gap: 0.5rem; align-items: center; }
+    .mock-btn {
+      padding: 0.35rem 0.85rem; border-radius: var(--radius);
+      background: var(--accent); color: ${t.glass || t.neon || t.cosmic || t.forest || t.ocean || t.volcanic ? "#fff" : t.bg === "#fff" || t.bg === "#fafafa" ? "#fff" : "inherit"};
+      border: none; font-family: inherit; font-size: 0.8rem; font-weight: 600;
+    }
+    .mock-btn.secondary { background: var(--bg2); color: var(--text); border: 1px solid rgba(128,128,128,0.2); }
+    .mock-main { flex: 1; display: flex; min-height: 0; }
+    .mock-board-wrap {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      background: var(--board-bg); padding: 1rem;
+    }
+    .mock-board-wrap svg { max-width: 100%; max-height: 100%; }
+    .mock-sidebar {
+      width: 220px; flex-shrink: 0; background: var(--surface);
+      border-inline-start: 1px solid rgba(128,128,128,0.15);
+      padding: 0.75rem; display: flex; flex-direction: column; gap: 0.75rem;
+      overflow: hidden;
+    }
+    .mock-panel { font-size: 0.75rem; }
+    .mock-panel h3 {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted); margin-bottom: 0.4rem; font-weight: 600;
+    }
+    .mock-player {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.5rem; border-radius: var(--radius); margin-bottom: 0.25rem;
+      background: var(--bg2);
+    }
+    .mock-player.active { outline: 2px solid var(--accent); }
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .mock-resources { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .mock-res {
+      width: 22px; height: 22px; border-radius: 4px; font-size: 0.6rem;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+      color: #fff;
+    }
+    .mock-log { font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+    .mock-hand {
+      display: flex; gap: 0.5rem; padding: 0.5rem 1rem;
+      background: var(--surface); border-top: 1px solid rgba(128,128,128,0.15);
+      justify-content: center;
+    }
+    .mock-card {
+      width: 52px; height: 72px; border-radius: calc(var(--radius) * 0.6);
+      background: var(--bg2); border: 1px solid rgba(128,128,128,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .mock-controls {
+      display: flex; gap: 0.5rem; padding: 0.6rem 1rem;
+      background: var(--surface); border-top: 1px solid rgba(128,128,128,0.15);
+      justify-content: center; flex-wrap: wrap;
+    }
+    ${extra}
+  `;
+}
+
+function renderPreviewDocument(id) {
+  const num = Math.max(1, Math.min(30, parseInt(id, 10) || 1));
+  const concept = concepts[num - 1];
+  const theme = concept.theme;
+  const boardSvg = buildBoardSvg(theme);
+
+  const filters = theme.neon
+    ? `<defs><filter id="neonGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`
+    : theme.gold
+      ? `<defs><filter id="goldGlow"><feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#d4af37"/></filter></defs>`
+      : "";
+
+  return `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>#${num} ${concept.title} · תצוגה מקדימה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>${getPreviewStyles(theme)}</style>
+</head>
+<body>
+  <div class="preview-banner">
+    <strong>תצוגה מקדימה בלבד</strong> · #${num} — ${concept.title} (${concept.style})
+  </div>
+  <div class="mock-app">
+    <header class="mock-header">
+      <div style="display:flex;align-items:center">
+        <span class="mock-logo">🎲 קטאן</span>
+        <span class="mock-turn">תור: שחקן 1</span>
+        <span class="mock-dice"><span>3</span><span>4</span></span>
+      </div>
+      <div class="mock-header-right">
+        <button class="mock-btn secondary">EN</button>
+        <button class="mock-btn">משחק חדש</button>
+      </div>
+    </header>
+    <div class="mock-main">
+      <div class="mock-board-wrap">
+        <svg viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg">
+          ${filters}
+          ${boardSvg}
+        </svg>
+      </div>
+      <aside class="mock-sidebar">
+        <div class="mock-panel">
+          <h3>שחקנים</h3>
+          <div class="mock-player active"><span class="mock-dot" style="background:#e63946"></span> שחקן 1 · 2 נק'</div>
+          <div class="mock-player"><span class="mock-dot" style="background:#457b9d"></span> שחקן 2 · 1 נק'</div>
+          <div class="mock-player"><span class="mock-dot" style="background:#2a9d8f"></span> שחקן 3 · 0 נק'</div>
+        </div>
+        <div class="mock-panel">
+          <h3>בנק</h3>
+          <div class="mock-resources">
+            <span class="mock-res" style="background:${RESOURCE_COLORS.brick}">🧱</span>
+            <span class="mock-res" style="background:${RESOURCE_COLORS.wood}">🌲</span>
+            <span class="mock-res" style="background:${RESOURCE_COLORS.sheep}">🐑</span>
+            <span class="mock-res" style="background:${RESOURCE_COLORS.wheat}">🌾</span>
+            <span class="mock-res" style="background:${RESOURCE_COLORS.ore}">⛏</span>
+          </div>
+        </div>
+        <div class="mock-panel">
+          <h3>יומן</h3>
+          <div class="mock-log">שחקן 1 זרק 7<br/>שחקן 2 בנה כביש<br/>שחקן 1 קיבל חיטה</div>
+        </div>
+      </aside>
+    </div>
+    <div class="mock-hand">
+      <div class="mock-card">🧱</div>
+      <div class="mock-card">🌲</div>
+      <div class="mock-card">🐑</div>
+      <div class="mock-card">🌾</div>
+    </div>
+    <footer class="mock-controls">
+      <button class="mock-btn secondary">סחר</button>
+      <button class="mock-btn secondary">בנייה</button>
+      <button class="mock-btn">סיים תור</button>
+    </footer>
+  </div>
+</body>
+</html>`;
+}
+
+window.DesignPreview = { concepts, renderPreviewDocument };

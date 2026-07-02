@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>קטאן · Catan</title>
+    <link rel="stylesheet" href="styles/main.css?v=9" />
+  </head>
+  <body>
+    <!-- Setup screen (populated by main.js) -->
+    <div id="setup-screen"></div>
+
+    <!-- Game screen (hidden until Start Game) -->
+    <div id="game-screen" class="is-hidden" style="display: none">
+      <header id="game-header">
+        <div class="header-left">
+          <span id="game-logo">🎲 קטאן</span>
+          <span id="turn-indicator"></span>
+          <div id="dice-display"></div>
+        </div>
+        <div class="header-right">
+          <div id="game-lang" class="lang-switch"></div>
+          <button id="new-game-btn"></button>
+        </div>
+      </header>
+
+      <div id="prompt-banner" hidden></div>
+
+      <main id="game-main">
+        <div id="board-wrap">
+          <svg id="board" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <aside id="sidebar">
+          <div id="players-panel" class="sidebar-section"></div>
+          <div id="bank-panel" class="sidebar-section"></div>
+          <div id="log-panel" class="sidebar-section"></div>
+        </aside>
+      </main>
+
+      <section id="player-hand"></section>
+
+      <footer id="controls"></footer>
+    </div>
+
+    <!-- Generic modal -->
+    <div id="modal-overlay" class="is-hidden" style="display: none">
+      <div id="modal"></div>
+    </div>
+
+    <script type="module" src="src/main.js?v=10"></script>
+  </body>
+</html>
